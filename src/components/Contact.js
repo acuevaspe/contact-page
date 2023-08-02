@@ -1,15 +1,47 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Box, Button, Input, Text, Link } from '@chakra-ui/react';
 import '../styles/Contact.css';
 
 const Contact = () => {
+    const emailRef = useRef(null);
+    const nameRef = useRef(null);
+    const phoneNumberRef = useRef(null);
+    const contactReasonRef = useRef(null);
+  
+    const [showThankYou, setShowThankYou] = useState(false);
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
+  
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const email = emailRef.current.value;
+        const name = nameRef.current.value;
+        const phoneNumber = phoneNumberRef.current.value;
+        const contactReason = contactReasonRef.current.value;
+
+        const isValidEmail = !email.includes('gmail.com');
+        const isValidPhoneNumber = phoneNumber.replace(/[^0-9]/g, '').length >= 10;
+
+        if (isValidEmail && isValidPhoneNumber) {
+            setShowErrorMessage(false);
+            setShowThankYou(true);
+        } else {
+            setShowErrorMessage(true);
+            setShowThankYou(false);
+        }
+    };
+  
+    const handleArrowClick = () => {
+      emailRef.current.focus();
+    };
+
     return (
         <Box className='contact-container'>
             <Box className='top-bar' bg='#000' h='36px' display='flex' justifyContent='center' alignItems='center' color='#fff'>
                 Learn more about our latest features
             </Box>
 
-            <h1 className='header-title' textAlign='center' color='#000' mt='13px'>
+            <h1 className='header-title' color='#000' mt='13px'>
                 B2B
             </h1>
 
@@ -17,23 +49,53 @@ const Contact = () => {
                 <Text fontSize='24px' fontWeight='bold'>
                     Contact Us
                 </Text>
-                <Text color='#000' mt='8px'>
-                    Please provide some information to get started.
+                {showThankYou ? (
+                    <Text color='#008000' mt='8px'>
+                        Thank you for your submission!
                 </Text>
+                ) : (
+                    <Text color='#000' mt='8px'>
+                        Please provide some information to get started.
+                </Text>
+                )}
             </Box>
 
             <Box className='body-container' mt='58px' display='flex'>
-                <form className='form-container'>
-                    <Input type='email' placeholder='Email' />
-                    <Input type='text' placeholder='Name' />
-                    <Input type='text' placeholder='Phone Number' />
-                    <select>
+                <form className='form-container'onSubmit={handleSubmit}>
+                    <Input
+                        id='email-input'
+                        type='email'
+                        placeholder='Email'
+                        ref={emailRef}
+                        isInvalid={showErrorMessage && emailRef.current.value.includes('gmail.com')}
+                        />
+                    <Input
+                        type='text'
+                        placeholder='Name'
+                        ref={nameRef}
+                        />
+                    <Input
+                        type='text'
+                        placeholder='Phone Number'
+                        ref={phoneNumberRef}
+                        isInvalid={showErrorMessage && phoneNumberRef.current.value.replace(/[^0-9]/g, '').length !== 10} />
+                    <select ref={contactReasonRef} defaultValue='default'>
+                        <option value='default' disabled>
+                            Select a contact reason
+                        </option>
                         <option value='Sales'>Sales</option>
                         <option value='Press'>Press</option>
                         <option value='Support'>Support</option>
                         <option value='Demo'>Demo</option>
                     </select>
-                    <Button className='submit' type='submit'>Submit</Button>
+                    {showErrorMessage && (
+                        <Text color='red' mt='8px'>
+                            Please provide valid email (no gmail.com) and phone number.
+                        </Text>
+                    )}
+                    <Button className='submit' type='submit'>
+                        Submit
+                    </Button>
                 </form>
 
                 <Box className='right-column' flex='1' p='20px' color='#000' fontFamily='Inter' fontSize='16px' fontStyle='normal' fontWeight='400' lineHeight='normal'>
@@ -83,8 +145,8 @@ const Contact = () => {
                             <Link href='#'>Support</Link>
                         </Box>
                     </Box>
-                    <Box className='footer-column' flex='1'>
-                        <Box className='arrow-icon' cursor='pointer'  color='#fff'>
+                    <Box className='footer-column' flex='1' onClick={handleArrowClick} cursor='pointer'>
+                        <Box className='arrow-icon' cursor='pointer' color='#fff'>
                             ^
                         </Box>
                     </Box>
@@ -92,7 +154,7 @@ const Contact = () => {
 
                 <Box className='footer-row'>
                     <Box className='white-divider' w='100%' h='1px' bg='#fff' mt='25px' />
-                    <Text className='copyright' textAlign='center' fontFamily='Inter' fontSize='15px' fontWeight='400' lineHeight='normal' mt='25px'>
+                    <Text className='copyright' fontFamily='Inter' fontSize='15px' fontWeight='400' lineHeight='normal' mt='25px'>
                         © 2022 Example
                     </Text>
                 </Box>
